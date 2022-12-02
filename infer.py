@@ -37,7 +37,7 @@ class Inference:
             )
             return self.tokenizer.decode(decoded_output[0], skip_special_tokens=True)
 
-        if decoding_strategy == 'Beam Search':
+        elif decoding_strategy == 'Beam Search':
             decoded_output = self.model.generate(
                 inputs=prompt_input_ids,
                 do_sample=False,
