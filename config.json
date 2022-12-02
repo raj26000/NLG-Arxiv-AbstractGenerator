@@ -1,0 +1,17 @@
+{
+    "eos": "<|endoftext|>",
+    "bos": "<|startoftext|>",
+    "pad": "<|pad|>",
+    "unk": "<|unk|>",
+    "holdout_test_frac": 0.05,
+    "train_frac": 0.8,
+    "batch_size": 4,
+    "n_accumulate": 8,
+    "lr": 2e-5,
+    "weight_decay": 1e-2,
+    "seed": 2022,
+    "epochs": 15,
+    "patience": 3,
+    "saved_checkpoint": "gpt2_checkpoint.pt",
+    "hf_finetuned_checkpoint": "raj26000/gpt2-arxiv-cs.CL"
+}
