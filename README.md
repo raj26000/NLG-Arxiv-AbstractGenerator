@@ -16,7 +16,7 @@ conda env create -f environment.yml
 ```
 input = <|startoftext|> title <|SEP|> abstract <|endoftext|>
 ```
-- In order to perform training, first check the appropriate hyperparameters in ['config.json'](config.json) and alter them if you wish to. Then execute the training with the following terminal command: `python train.py`. The best model and tokenizer checkpoints will be saved automatically in the path provided in config.
+- In order to perform training, first check the appropriate hyperparameters in [`config.json`](config.json) and alter them if you wish to. Then execute the training with the following terminal command: `python train.py`. The best model and tokenizer checkpoints will be saved automatically in the path provided in config.
 - The trained model and tokenizer checkpoints I obtained were deployed on HuggingFace Hub and can be directly used to perform inference - in case one doesn't want to run the training again. Here is the [**HF model repository**](https://huggingface.co/raj26000/gpt2-arxiv-cs.CL) for the same. 
 
 ## Performing Inference
