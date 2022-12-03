@@ -22,6 +22,20 @@ class Inference:
                           top_p=0.95,
                           temperature=0.7,
                           penalty_alpha=0.6):
+        """
+        Method to generate the output sequence using the finetuned model for test samples.
+        :param title: Title of an arXiv paper with cs.CL category
+        :param decoding_strategy: Provide one among - Greedy Search, Beam Search, Stochastic Sampling, Contrastive Search
+        :param num_beams: number of beams for beam search, has to be > 1 to perform beam search
+        :param early_stopping: Stopping beam search when any beam hits <|endoftext|> token.
+        :param no_repeat_ngram_size: Order of n-gram to avoid repetitions in outputs
+        :param max_length: Max length of output sequence (including input title prompt)
+        :param top_k: choose top-k most probable words from decoder output before sampling or contrastive search.
+        :param top_p: to choose the smallest subset of words from vocab such that sum of probabilities hits p, before sampling.
+        :param temperature: to scale logits by a factor before applying softmax to the vocab subset during sampling.
+        :param penalty_alpha: Model degeneracy penalty weight 'alpha' in contrastive search objective function. To penalize repetitive tokens.
+        :return: Decoded output sequence, from which abstract is later separated.
+        """
         prompt = self.config['bos'] + ' ' + title + ' ' + '<|SEP|>'
         prompt_input_ids = torch.tensor(self.tokenizer.encode(prompt)).unsqueeze(0).to(self.config['device'])
         prompt_attn_mask = torch.tensor(self.tokenizer(prompt)['attention_mask']).unsqueeze(0).to(self.config['device'])

@@ -12,6 +12,9 @@ from torch.optim import AdamW
 
 
 class AbsGenDataset(Dataset):
+    """
+    Custom Dataset class
+    """
     def __init__(self, tokenizer, texts):
         self.tokenizer = tokenizer
         self.texts = texts
@@ -20,6 +23,10 @@ class AbsGenDataset(Dataset):
         return len(self.texts)
 
     def __getitem__(self, idx):
+        """
+        :param idx: specific index to sample
+        :return: dict of input_ids and attention_mask from tokenized input.
+        """
         tokenized_text = self.tokenizer(self.texts[idx],
                                         truncation=True,
                                         max_length=1024,
@@ -52,6 +59,9 @@ class Trainer:
                                                        unk_token=self.config['unk'])
 
     def set_seed(self):
+        """
+        For reproducibility of experiments.
+        """
         np.random.seed(self.config['seed'])
         torch.manual_seed(self.config['seed'])
         torch.cuda.manual_seed(self.config['seed'])
@@ -60,6 +70,11 @@ class Trainer:
         os.environ['PYTHONHASHSEED'] = str(self.config['seed'])
 
     def prepare_data(self):
+        """
+        Clean data and create input text for model training and validation.
+        input_text = <|startoftext|> title <|SEP|> abstract <|endoftext|>
+        :return: train, val, test datasets with above changes.
+        """
         self.train_df['title'] = self.train_df['title'].apply(lambda text: ' '.join([x for x in text.split()]))
         self.train_df['abstract'] = self.train_df['abstract'].apply(lambda text: ' '.join([x for x in text.split()]))
         self.train_df['input_text'] = self.config['bos'] + ' ' + self.train_df['title'] + ' ' + '<|SEP|>' + ' ' + \
@@ -82,6 +97,13 @@ class Trainer:
         return train_dataloader, val_dataloader
 
     def train_loop(self, model, dataloader, optimizer):
+        """
+        Training loop over one epoch for all batches created by the dataloader.
+        :param model: Pretrained GPT2 model from Huggingface to finetune.
+        :param dataloader: train_dataloader created in above method.
+        :param optimizer: Optimizer (AdamW)
+        :return: Average loss across all batches for the epoch
+        """
         model.train()
         scaler = torch.cuda.amp.GradScaler()
         batch_losses = []
@@ -103,6 +125,12 @@ class Trainer:
 
     @torch.no_grad()
     def val_loop(self, model, dataloader):
+        """
+        Validation loop over all batches for one epoch.
+        :param model: model object that is being finetuned
+        :param dataloader: val_dataloader created in def create_dataloaders()
+        :return: Average loss across all batches for the epoch
+        """
         model.eval()
         batch_losses = []
         for batch_num, batch in tqdm(enumerate(dataloader)):
@@ -117,6 +145,11 @@ class Trainer:
         return np.mean(batch_losses)
 
     def run_training(self):
+        """
+        Use all above methods to perform training over all epochs.
+        Early stopping is used to obtain best model checkpoint, which is saved in the path specified in config.
+        :return: Training history - {train_loss: [], val_loss: []}
+        """
         train_dataloader, val_dataloader = self.create_dataloaders()
         model = GPT2LMHeadModel.from_pretrained('gpt2')
         model.resize_token_embeddings(len(self.tokenizer))
@@ -152,6 +185,9 @@ class Trainer:
 
 
 if __name__ == '__main__':
+    """
+    Run in terminal with python train.py
+    """
     trainer = Trainer()
     trainer.set_seed()
     history = trainer.run_training()
